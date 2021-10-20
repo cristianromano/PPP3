@@ -1,0 +1,14 @@
+[
+    {
+        "descuento": 10,
+        "precio": 9.999,
+        "id_cupon": 34,
+        "usado": true
+    },
+    {
+        "descuento": 20,
+        "precio": 19.998,
+        "id_cupon": 974,
+        "usado": true
+    }
+]
