@@ -7,12 +7,21 @@ class Pizza
 {
 
     // public $email;
+
     public $sabor;
     public $tipo;
     public $cantidad;
+    public $numero_pedido;
+
     // public $fecha;
     // public $numero_pedido;
+
     public $imagen;
+    public $numero_descuento;
+
+    // public $numero_pedido;
+    // public $motivo;
+    // public $id_cupon;
 
 
 
@@ -66,7 +75,8 @@ class Pizza
         $pizza->fecha = date("Y-m-d");
         // $pizza->id_pedido = $id_pedido;
         $pizza->imagen = $imagen;
-
+        $pizza->precio = 0;
+        $pizza->descuento = 0;
         return $pizza;
     }
 
@@ -74,7 +84,6 @@ class Pizza
     public function __construct()
     {
     }
-
 
 
     public static function guardarJSON($objeto)
@@ -185,7 +194,7 @@ class Pizza
     public static function traerPizza()
     {
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
-        $consulta = $objetoAccesoDato->RetornarConsulta("SELECT * FROM pizza");
+        $consulta = $objetoAccesoDato->RetornarConsulta("SELECT * FROM venta");
         if ($consulta->execute()) {
             return $consulta->fetchAll(PDO::FETCH_CLASS, "Pizza");
         } else {
@@ -207,6 +216,7 @@ class Pizza
                     $cadena .= 'se descuenta stock';
                     self::EliminarStockArr($productos);
                     $retorno = true;
+                    
                     $this->InsertarProducto();
                 } else {
                     echo 'no hay stock';
@@ -276,8 +286,8 @@ class Pizza
     public function InsertarProducto()
     {           //`id`, `codigo`, `nombre`, `tipo`, `stock`, `precio`, `fecha_de_creacion`, `fecha_de_modificacion`
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
-        $consulta = $objetoAccesoDato->RetornarConsulta("INSERT INTO venta(email,sabor,tipo,cantidad,fecha,numero_pedido,imagen) 
-               VALUES (:email,:sabor,:tipo,:cantidad,:fecha,:numero_pedido,:imagen)");
+        $consulta = $objetoAccesoDato->RetornarConsulta("INSERT INTO venta(email,sabor,tipo,cantidad,fecha,numero_pedido,imagen,precio,descuento,numero_descuento) 
+               VALUES (:email,:sabor,:tipo,:cantidad,:fecha,:numero_pedido,:imagen,:precio,:descuento,:numero_descuento)");
         $consulta->bindValue(':email', $this->email, PDO::PARAM_STR);
         $consulta->bindValue(':sabor', $this->sabor, PDO::PARAM_STR);
         $consulta->bindValue(':tipo', $this->tipo, PDO::PARAM_STR);
@@ -285,10 +295,14 @@ class Pizza
         $consulta->bindValue(':fecha', $this->fecha, PDO::PARAM_STR);
         $consulta->bindValue(':numero_pedido', $this->numero_pedido, PDO::PARAM_INT);
         $consulta->bindValue(':imagen', $this->imagen, PDO::PARAM_STR);
+        $consulta->bindValue(':precio', $this->precio, PDO::PARAM_STR);
+        $consulta->bindValue(':descuento', $this->descuento, PDO::PARAM_STR);
+        $consulta->bindValue(':numero_descuento', $this->numero_descuento, PDO::PARAM_INT);
         // $consulta->bindValue(':id_pedido', $this->id_pedido, PDO::PARAM_INT);
         $consulta->execute();
         return $objetoAccesoDato->RetornarUltimoIdInsertado();
     }
+
 
 
     public function ModificarStock()
@@ -304,9 +318,9 @@ class Pizza
     public static function TraerTodosLosProductos()
     {
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
-        $consulta = $objetoAccesoDato->RetornarConsulta("SELECT * FROM pizza");
+        $consulta = $objetoAccesoDato->RetornarConsulta("SELECT * FROM venta");
         if ($consulta->execute()) {
-            return $consulta->fetchAll(PDO::FETCH_CLASS, "Pizza");
+            return $consulta->fetchAll(PDO::FETCH_OBJ);
         } else {
             echo 'err';
         }
@@ -414,6 +428,17 @@ class Pizza
         return $consulta->execute();
     }
 
+      public function ModificarEmail()
+    {
+        $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
+        $consulta = $objetoAccesoDato->RetornarConsulta("UPDATE venta SET email = :email WHERE numero_pedido = :numero_pedido   ");
+     
+
+        $consulta->bindValue(':email', $this->email, PDO::PARAM_STR);
+        $consulta->bindValue(':numero_pedido', $this->numero_pedido, PDO::PARAM_STR);
+        return $consulta->execute();
+    }
+
     public static function EliminarPedido($numero)
     {
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
@@ -437,13 +462,39 @@ class Pizza
         $consulta->bindValue(':numero', $numero, PDO::PARAM_INT);
 
         if ($consulta->execute()) {
-            return $consulta->fetchAll(PDO::FETCH_CLASS, "Pizza");
+            return $consulta->fetch(PDO::FETCH_OBJ);
         } else {
             echo 'err';
         }
     }
 
-    public static function borrarImagenVenta($pizza)
+    public static function mostrarFotosOriginales($arrProductos)
+    {
+
+        $cadena = "<ul>";
+        // Productos::guardarJSON($arrProductos);
+        foreach ($arrProductos as $x) {
+            $cadena .= "<li>" .
+                "Imagen:" . $x->imagen;
+        }
+        $cadena .= "</ul>";
+        echo $cadena;
+    }
+
+    public static function traerImagenesOriginales()
+    {
+        $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
+        $consulta = $objetoAccesoDato->RetornarConsulta("SELECT imagen FROM venta ");
+
+        if ($consulta->execute()) {
+            return $consulta->fetchAll(PDO::FETCH_OBJ);
+        } else {
+            echo 'err';
+        }
+    }
+
+
+    public static function borrarImagenVenta($imagen)
     {
 
         $destino = 'BACKUVENTAS/';
@@ -451,12 +502,12 @@ class Pizza
             mkdir('BACKUVENTAS/', 0777, true);
         }
 
-        $final = $destino.$pizza[0]->imagen;
-        $origen = 'ImagenesDeLaVenta/'.$pizza[0]->imagen;
+        $final = $destino.$imagen;
+        $origen = 'ImagenesDeLaVenta/'.$imagen;
         if (copy($origen, $final)) {
  
             echo "Se ha copiado correctamente la imagen";
-            unlink('ImagenesDeLaVenta/'.$pizza[0]->imagen);
+            unlink('ImagenesDeLaVenta/'.$imagen);
             }
      
             else {
@@ -466,4 +517,13 @@ class Pizza
             }
 
     }
+
+
+
+
+
+
+
+
+
 }

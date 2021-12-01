@@ -1,14 +1,92 @@
 [
     {
         "descuento": 10,
-        "precio": 9.999,
+        "precio": 17.998,
         "id_cupon": 34,
         "usado": true
     },
     {
         "descuento": 20,
-        "precio": 19.998,
+        "precio": 17.998,
         "id_cupon": 974,
         "usado": true
+    },
+    {
+        "descuento": 20,
+        "precio": 17.998,
+        "id_cupon": 813,
+        "usado": true
+    },
+    {
+        "descuento": 20,
+        "precio": 17.998,
+        "id_cupon": 85,
+        "usado": true
+    },
+    {
+        "descuento": 20,
+        "precio": 17.998,
+        "id_cupon": 6,
+        "usado": true
+    },
+    {
+        "descuento": 20,
+        "precio": 17.998,
+        "id_cupon": 42,
+        "usado": true
+    },
+    {
+        "descuento": 10,
+        "precio": 17.998,
+        "id_cupon": 688,
+        "usado": true
+    },
+    {
+        "descuento": 10,
+        "precio": 17.998,
+        "id_cupon": 884,
+        "usado": true
+    },
+    {
+        "descuento": 10,
+        "precio": 0,
+        "id_cupon": 736,
+        "usado": true
+    },
+    {
+        "descuento": 10,
+        "precio": 17.998,
+        "id_cupon": 687,
+        "usado": true
+    },
+    {
+        "descuento": 10,
+        "precio": 17.998,
+        "id_cupon": 604,
+        "usado": true
+    },
+    {
+        "descuento": 10,
+        "precio": 0,
+        "id_cupon": 211,
+        "usado": false
+    },
+    {
+        "descuento": 10,
+        "precio": 0,
+        "id_cupon": 25,
+        "usado": false
+    },
+    {
+        "descuento": 10,
+        "precio": 0,
+        "id_cupon": 734,
+        "usado": false
+    },
+    {
+        "descuento": 10,
+        "precio": 0,
+        "id_cupon": 604,
+        "usado": false
     }
 ]

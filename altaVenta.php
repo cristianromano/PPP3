@@ -20,30 +20,55 @@ $imagen = $_FILES['archivo'];
 $cantidad = $_POST['cantidad'];
 
 
-// if (isset($sabor) && isset($email) & isset($tipo) & isset($cantidad)) {
-$nombre = explode('@', $email);
+if (isset($sabor) && isset($email) & isset($tipo) & isset($cantidad)) {
+    
+    $flag = 0;
+    
+    $nombre = explode('@', $email);
 
-$path = $imagen['name'];
-$extension = pathinfo($path, PATHINFO_EXTENSION);
+    $path = $imagen['name'];
+    $extension = pathinfo($path, PATHINFO_EXTENSION);
 
-$nombrePizza = $tipo . '-' . $sabor . '-' . $nombre[0] . '-' . "2021-10-19" . '.' . $extension;
+    $nombrePizza = $tipo . '-' . $sabor . '-' . $nombre[0] . '-' . "2021-10-19" . '.' . $extension;
 
-$pizza = Pizza::crearPizzaAlta($email, $sabor, $tipo, $cantidad, $nombrePizza);
-var_dump($pizza);
-$cupon = new Cupon(0, 20);
+    $pizza = Pizza::crearPizzaAlta($email, $sabor, $tipo, $cantidad, $nombrePizza);
 
-if ($cupon->usado == false) {
-    if ($cupon->verificarJSON($pizza)) {
-        'descuento aplicado';
-        $cuponArr = array();
-        $cuponArr = json_decode(file_get_contents('./archivos/Cupon.json', true));
-        array_push($cuponArr, $cupon);
-        Cupon::guardarJSON($cuponArr);
+    $cupones = Cupon::obtenerCuponesJSON();
+
+    foreach ($cupones as  $cupon) {
+        if ($cupon['usado'] == false) {
+            $flag = 1;
+
+            $cuponObj = new Cupon($cupon['precio'],$cupon['descuento'],$cupon['id_cupon']);
+
+            if ($cuponObj->verificarJSON($pizza)) {
+                'descuento aplicado';
+                $pizza->numero_cupon = $cuponObj->id_cupon;
+                $cuponObj->cambiarEstadoCupon();
+                $cuponArr = array();
+                $cuponArr = json_decode(file_get_contents('./archivos/Cupon.json', true));
+                array_push($cuponArr, $cupon);
+                Cupon::guardarJSON($cuponArr);
+            }
+            if ($pizza->VentaPizza()) {
+                $pizza->GuardarImagen($imagen);
+            }
+            
+            break;
+        }
     }
+
+    if ($flag == 0) {
+       echo 'no hay cupones';
+    }
+
+
+
+
+
+
+
+
+
+
 }
-
-
-    if ($pizza->VentaPizza()) {
-        $pizza->GuardarImagen($imagen);
-    }
-
